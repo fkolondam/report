@@ -150,8 +150,9 @@ function getStartAndEndDate($week, $year=2018)
 		  <tr style="background-color: #eee;">
 			<td colspan="2"><strong>S U B    T O T A L</strong></td>
 		 <?php
-				$totWeek = 0;
+				
 				for($i=0;$i<$jlhWeek;$i++){
+					$totWeek3 = 0;
 					//$awalAkhirWeek = getStartAndEndDate($weekNumbers[$i]-1);
 					$awalWeek = getStartAndEndDate($weekNumbers[$i]-1)[0];
 					$akhirWeek = getStartAndEndDate($weekNumbers[$i]-1)[1];
@@ -165,7 +166,7 @@ function getStartAndEndDate($week, $year=2018)
 					//echo $sql3;
 					$exeSql3 = sqlsrv_query($conn,$sql3);
 					$resSql3 = sqlsrv_fetch_array($exeSql3);
-					$totWeek2 += $resSql3["TOT"];
+					$totWeek3 += $resSql3["TOT"];
 				?>
 				<td align="right"><?php echo number_format($totWeek2); ?></td>
 				<?php } ?>
