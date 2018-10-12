@@ -168,7 +168,7 @@ function getStartAndEndDate($week, $year=2018)
 					$resSql3 = sqlsrv_fetch_array($exeSql3);
 					$totWeek3 += $resSql3["TOT"];
 				?>
-				<td align="right"><?php echo number_format($totWeek2); ?></td>
+				<td align="right"><?php echo number_format($totWeek3); ?></td>
 				<?php } ?>
 			<td align="right"><?php echo number_format($totex); ?></td>
 		</tr>
