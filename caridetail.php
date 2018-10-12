@@ -152,7 +152,8 @@ function getStartAndEndDate($week, $year=2018)
 		 <?php
 				$totWeek = 0;
 				for($i=0;$i<$jlhWeek;$i++){
-					$awalAkhirWeek = getStartAndEndDate($weekNumbers[$i]-1);
+					$awalWeek = getStartAndEndDate($weekNumbers[$i]-1)[0];
+					$akhirWeek = getStartAndEndDate($weekNumbers[$i]-1)[1];
 					//$akhirWeek = getStartAndEndDate($weekNumbers[$i]-1)[1];
 					// Mencari nilai penjualan per Salesmen dari Week ini
 					$sql3 ="SELECT(SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm))
