@@ -154,16 +154,16 @@ function getStartAndEndDate($week, $year=2018)
 				for($i=0;$i<$jlhWeek;$i++){
 					$awalWeek = getStartAndEndDate($weekNumbers[$i]-1)[0];
 					$akhirWeek = getStartAndEndDate($weekNumbers[$i]-1)[1];
-					//$akhirWeek = getStartAndEndDate($weekNumbers[$i]-1)[1];
 					// Mencari nilai penjualan per Salesmen dari Week ini
-					$sql3 ="SELECT(SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm))
+					$sql2 ="SELECT(SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm))
 					as 'TOT' 
 					FROM dbo.trs_sls_hdr 
-					WHERE (dbo.trs_sls_hdr.Sls_Date BETWEEN '$awalWeek' AND '$akhirWeek') 
-					AND dbo.trs_sls_hdr.Sls_Invtp = 'S'";
-					//echo $sql3;
-					$exeSql3 = sqlsrv_query($conn,$sql3);
-					$resSql3 = sqlsrv_fetch_array($exeSql3);
+					WHERE dbo.trs_sls_hdr.Sls_slmcd = '$row[Slm_Code]'
+					AND dbo.trs_sls_hdr.Sls_Invtp = 'S'
+					AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$awalWeek' AND '$akhirWeek')";
+					//echo $sql2;
+					$exeSql2 = sqlsrv_query($conn,$sql2);
+					$resSql2 = sqlsrv_fetch_array($exeSql2);
 					$totWeek += $resSql2["TOT"];
 				?>
 				<td align="right"><?php echo number_format($totWeek); ?></td>
