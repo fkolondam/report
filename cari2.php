@@ -54,7 +54,7 @@ function getStartAndEndDate($week, $year=2018)
 		<fieldset>
 		<legend>Range waktu Data :</legend>
 		<p>Dari: <input type="text" id="datepicker" name="tgl1" autocomplete="off">
-		Sampai: <input type="text" id="datepicker2" name="tgl2" autocomplete="off"></p>	
+		Sampai: <input type="text" id="datepicker2" name="tgl2" autocomplete="off"></p>
 		</fieldset>
 		<hr />
 		 <input type="submit" value="cari" name="cari" style="width: 100%;padding: 5px;" />
@@ -62,26 +62,26 @@ function getStartAndEndDate($week, $year=2018)
 	<?php
 		$z="0";
 		if (isset($_POST['cari'])) {
-			
+
 			$tgl1=$_POST['tgl1'];
 			$tgl2=$_POST['tgl2'];
 			$opsi_lap = $_POST['OPSI_LAPORAN'];
 			echo "<h3>Menampilkan data penjualan Tanggal : $tgl1 s.d $tgl2</h3>";
 			if($opsi_lap == "SLS_BY_SLSMEN_SHOW_BY_CUST"){
-			/*$sql = "SELECT 
+			/*$sql = "SELECT
 			dbo.trs_sls_hdr.Sls_Number,
 			dbo.trs_sls_hdr.Sls_Date,
 			DISTINCT(dbo.trs_sls_hdr.Cus_Code),
 			dbo.trs_sls_hdr.Sls_slmcd,
-			where dbo.trs_sls_hdr.Sls_Tvallocal > 0, 
-			dbo.Mst_Cust.Cus_Fpname, 
-			dbo.Mst_Slsman.Slm_Name 
-			FROM dbo.trs_sls_hdr 
-			INNER JOIN dbo.Mst_Slsman ON dbo.trs_sls_hdr.Sls_slmcd = dbo.Mst_Slsman.Slm_Code 
+			where dbo.trs_sls_hdr.Sls_Tvallocal > 0,
+			dbo.Mst_Cust.Cus_Fpname,
+			dbo.Mst_Slsman.Slm_Name
+			FROM dbo.trs_sls_hdr
+			INNER JOIN dbo.Mst_Slsman ON dbo.trs_sls_hdr.Sls_slmcd = dbo.Mst_Slsman.Slm_Code
 			INNER JOIN dbo.Mst_Cust On dbo.trs_sls_hdr.Cus_Code = dbo.Mst_Cust.Cus_Code
 			WHERE dbo.trs_sls_hdr.Sls_Date '$tgl1' AND '$tgl2'
 			ORDER BY dbo.trs_sls_hdr.Sls_Date  ASC";*/
-			// 
+			//
 			$startDateUnix = strtotime($tgl1);
 		    $endDateUnix = strtotime($tgl2);
 
@@ -94,16 +94,16 @@ function getStartAndEndDate($week, $year=2018)
 		    }
 		    $jlhWeek = count($weekNumbers);
 		    //print_r($weekNumbers);
-			
-			$sql = "SELECT dbo.Mst_Cust.Cus_Code, dbo.Mst_Cust.Cus_Name FROM dbo.Mst_Cust WHERE dbo.Mst_Cust.Cus_Code in (select dbo.trs_sls_hdr.Cus_Code from dbo.trs_sls_hdr where dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')";
+
+			$sql = "SELECT TOP 10 dbo.Mst_Cust.Cus_Code, dbo.Mst_Cust.Cus_Name FROM dbo.Mst_Cust 
+			WHERE dbo.Mst_Cust.Cus_Code in (select dbo.trs_sls_hdr.Cus_Code from dbo.trs_sls_hdr where dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')";
 			//echo "$sql";
 			$exeSql = sqlsrv_query($conn,$sql);
-
 			?>
 			<table border="1" width="100%">
 			<tr>
-				<td width="4%">Kode Salesmen</td>
-				<td width="15%">Nama Salesmen</td>
+				<td width="4%">Kode Customer</td>
+				<td width="15%">Nama Customer</td>
 				<?php
 				for($i=0;$i<$jlhWeek;$i++){
 				?>
@@ -111,10 +111,10 @@ function getStartAndEndDate($week, $year=2018)
 				<?php } ?>
 				<td align="center">Total</td>
 			</tr>
-			<?php 
+			<?php
 				$subTotal = array();
 				while($row = sqlsrv_fetch_array($exeSql)){
-			?>			
+			?>
 			<tr>
 				<td><?php echo $row["Cus_Code"]; ?></td>
 				<td><?php echo $row["Cus_Name"]; ?></td>
@@ -124,22 +124,25 @@ function getStartAndEndDate($week, $year=2018)
 					$awalWeek = getStartAndEndDate($weekNumbers[$i]-1)[0];
 					$akhirWeek = getStartAndEndDate($weekNumbers[$i]-1)[1];
 					// Mencari nilai penjualan per Salesmen dari Week ini
-					$sql2 = "SELECT SUM(dbo.trs_sls_hdr.Sls_Tvallocal) as 'TOT' 
-							FROM dbo.trs_sls_hdr 
-							WHERE dbo.trs_sls_hdr.Cus_Code = '$row[Cus_Code]' AND dbo.trs_sls_hdr.Sls_Tvallocal > 0 
-							AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$awalWeek' AND '$akhirWeek')";
-					
+					$sql2 = "SELECT (SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm))
+					as 'TOT'
+					FROM dbo.trs_sls_hdr
+					WHERE dbo.trs_sls_hdr.Cus_Code = '$row[Cus_Code]' AND dbo.trs_sls_hdr.Sls_Tvallocal > 0
+					AND dbo.trs_sls_hdr.Sls_Invtp = 'S'
+					AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')
+					";
 					$exeSql2 = sqlsrv_query($conn,$sql2);
 					$resSql2 = sqlsrv_fetch_array($exeSql2);
-					$totWeek += $resSql2["TOT"];
-					$totex += $totWeek
+					$totWeek += $resSql2["TOT"]
+					
+				
 				?>
 				<td align="right"><?php echo number_format($resSql2["TOT"]); ?></td>
 				<?php } ?>
 				<td align="right"><?php echo number_format($totWeek); ?></td>
 			</tr>
 			<?php
-				}				
+				}
 		 ?>
 		 <tr style="background-color: #eee;">
 			<td colspan="2"><strong>S U B    T O T A L</strong></td>
@@ -149,12 +152,12 @@ function getStartAndEndDate($week, $year=2018)
 			<td align="right"><?php echo number_format($totex); ?></td>
 		</tr>
 
-		</table>	
-		<?php 
-			
+		</table>
+		<?php
+
 		} // END OF OPSI_LAPORAN
 		} // END OF SUBMIT
 		?>
-		</div>	
+		</div>
 </html>
 	</body>
