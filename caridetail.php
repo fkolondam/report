@@ -133,13 +133,13 @@ function getStartAndEndDate($week, $year=2018)
 					FROM dbo.trs_sls_hdr 
 					WHERE dbo.trs_sls_hdr.Sls_slmcd = '$row[Slm_Code]'
 					AND dbo.trs_sls_hdr.Sls_Invtp = 'S'
-					AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$awalWeek' AND '$akhirWeek')";
+					AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')";
 					//echo $sql2;
 					$exeSql2 = sqlsrv_query($conn,$sql2);
 					$resSql2 = sqlsrv_fetch_array($exeSql2);
 					$totWeek += $resSql2["TOT"];
 				?>
-				<td align="right"><?php echo number_format($resSql2["TOT"]); ?></td>
+				<td align="right"><?php echo $sql2//number_format($resSql2["TOT"]); ?></td>
 				<?php } ?>
 				<td align="right"><?php echo number_format($totWeek); ?></td>
 			</tr>
