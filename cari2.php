@@ -130,7 +130,7 @@ function getStartAndEndDate($week, $year=2018)
 					WHERE dbo.trs_sls_hdr.Cus_Code = '$row[Cus_Code]' AND dbo.trs_sls_hdr.Sls_Tvallocal > 0
 					AND dbo.trs_sls_hdr.Sls_Invtp = 'S'
 					AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')
-					";
+					ORDER BY TOT ASC"; // <-- So test ada taruh situ?
 					$exeSql2 = sqlsrv_query($conn,$sql2);
 					$resSql2 = sqlsrv_fetch_array($exeSql2);
 					$totWeek += $resSql2["TOT"]
