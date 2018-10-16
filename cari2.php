@@ -95,8 +95,13 @@ function getStartAndEndDate($week, $year=2018)
 		    $jlhWeek = count($weekNumbers);
 		    //print_r($weekNumbers);
 
-			$sql = "SELECT TOP 10 dbo.Mst_Cust.Cus_Code, dbo.Mst_Cust.Cus_Name FROM dbo.Mst_Cust 
-			WHERE dbo.Mst_Cust.Cus_Code in (select dbo.trs_sls_hdr.Cus_Code from dbo.trs_sls_hdr where dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')";
+			$sql = "SELECT dbo.trs_sls_hdr.Cus_Code, dbo.Mst_Cust.Cus_Name,
+			(SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm)) as 'TOT'
+			FROM dbo.Mst_Cust,dbo.trs_sls_hdr.Cus_Code 
+			WHERE 
+			dbo.Mst_Cust.Cus_Code = dbo.Mst_Cust.Cus_Code
+			AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')
+			ORDER BY TOT ASC";
 			//echo "$sql";
 			$exeSql = sqlsrv_query($conn,$sql);
 			?>
