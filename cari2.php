@@ -95,13 +95,14 @@ function getStartAndEndDate($week, $year=2018)
 		    $jlhWeek = count($weekNumbers);
 		    //print_r($weekNumbers);
 
-			$sql = "SELECT dbo.trs_sls_hdr.Cus_Code, dbo.Mst_Cust.Cus_Name,
-			(SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm)) as 'TOT'
-			FROM dbo.Mst_Cust,dbo.trs_sls_hdr.Cus_Code 
+			$sql = "SELECT TOP 50 dbo.trs_sls_hdr.Cus_Code, dbo.Mst_Cust.Cus_Name,
+			(SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm)) as 'TOT2'
+			FROM dbo.Mst_Cust,dbo.trs_sls_hdr 
 			WHERE 
-			dbo.Mst_Cust.Cus_Code = dbo.Mst_Cust.Cus_Code
+			dbo.Mst_Cust.Cus_Code = dbo.trs_sls_hdr.Cus_Code
 			AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')
-			ORDER BY TOT ASC";
+			GROUP BY dbo.trs_sls_hdr.Cus_Code, dbo.Mst_Cust.Cus_Name 
+			ORDER BY TOT2 DESC";
 			//echo "$sql";
 			$exeSql = sqlsrv_query($conn,$sql);
 			?>
@@ -134,7 +135,7 @@ function getStartAndEndDate($week, $year=2018)
 					FROM dbo.trs_sls_hdr
 					WHERE dbo.trs_sls_hdr.Cus_Code = '$row[Cus_Code]' AND dbo.trs_sls_hdr.Sls_Tvallocal > 0
 					AND dbo.trs_sls_hdr.Sls_Invtp = 'S'
-					AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')"; 
+					AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$awalWeek' AND '$akhirWeek')"; 
 					$exeSql2 = sqlsrv_query($conn,$sql2);
 					$resSql2 = sqlsrv_fetch_array($exeSql2);
 					$totWeek += $resSql2["TOT"]
@@ -146,6 +147,7 @@ function getStartAndEndDate($week, $year=2018)
 				<td align="right"><?php echo number_format($totWeek); ?></td>
 			</tr>
 			<?php
+				$totex += $totWeek;
 				}
 		 ?>
 		 <tr style="background-color: #eee;">
