@@ -99,15 +99,23 @@ function getStartAndEndDate($week, $year=2018)
 		    $jlhWeek = count($weekNumbers);
 		    //print_r($weekNumbers);
 			
-			$sql = "SELECT dbo.Mst_Slsman.Slm_Code, dbo.Mst_Slsman.Slm_Name FROM dbo.Mst_Slsman WHERE dbo.Mst_Slsman.Slm_Code in (select dbo.trs_sls_hdr.Sls_slmcd from dbo.trs_sls_hdr where dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')";
+			$sql = 	"SELECT dbo.Trs_Sls_Hdr.Sls_Number, dbo.Mst_Inv.Inv_Code, dbo.Mst_Inv.Inv_Name, dbo.Mst_Supp.Sup_Name
+					FROM dbo.Trs_Sls_Hdr,dbo.Trs_Sls_Dtl,dbo.Mst_Inv,dbo.Mst_Supp WHERE
+					dbo.trs_sls_dtl.Sls_Starttime BETWEEN '$tgl1' AND '$tgl2'
+					AND dbo.Trs_Sls_Hdr.Sls_Number = dbo.Trs_Sls_Dtl.Sls_Number
+					AND dbo.Trs_Sls_Dtl.Inv_Code = dbo.Mst_Inv.Inv_Code
+					AND dbo.Mst_Inv.Cat_Code = dbo.Mst_Supp.Sup_Code
+					AND dbo.trs_sls_hdr.Sls_Invtp = 'S'";
+			
+			
 			//echo "$sql";
 			$exeSql = sqlsrv_query($conn,$sql);
 			
 			?>
 			<table border="1" width="100%">
 			<tr>
-				<td width="4%">Kode Salesmen</td>
-				<td width="15%">Nama Salesmen</td>
+				<td width="4%">Kode Supplyer</td>
+				<td width="15%">Nama Supplyer</td>
 				<?php
 				for($i=0;$i<$jlhWeek;$i++){
 				?>
@@ -120,26 +128,25 @@ function getStartAndEndDate($week, $year=2018)
 				while($row = sqlsrv_fetch_array($exeSql)){
 			?>			
 			<tr>
-				<td><?php echo $row["Slm_Code"]; ?></td>
-				<td><?php echo $row["Slm_Name"]; ?></td>
+				<td><?php echo $row["Cat_Code"]; ?></td>
+				<td><?php echo $row["Sup_Name"]; ?></td>
 				<?php
 				$totWeek = 0;
 				for($i=0;$i<$jlhWeek;$i++){
 					$awalWeek = getStartAndEndDate($weekNumbers[$i]-1)[0];
 					$akhirWeek = getStartAndEndDate($weekNumbers[$i]-1)[1];
 					// Mencari nilai penjualan per Salesmen dari Week ini
-					$sql2 ="SELECT(SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm))
-					as 'TOT' 
-					FROM dbo.trs_sls_hdr 
-					WHERE dbo.trs_sls_hdr.Sls_slmcd = '$row[Slm_Code]' AND dbo.trs_sls_hdr.Sls_Tvallocal > 0
-					AND dbo.trs_sls_hdr.Sls_Invtp = 'S' 
+					$sql2 = "SELECT (SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm))
+					as 'TOT'
+					FROM dbo.trs_sls_hdr
+					WHERE dbo.trs_sls_dtl.Sls_Number = '$row[Cat_Code_Code]' AND dbo.trs_sls_hdr.Sls_Tvallocal > 0
+					AND dbo.trs_sls_hdr.Sls_Invtp = 'S'
 					AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')";
-					//echo $sql2;
 					$exeSql2 = sqlsrv_query($conn,$sql2);
 					$resSql2 = sqlsrv_fetch_array($exeSql2);
 					$totWeek += $resSql2["TOT"];
 				?>
-				<td align="right"><?php echo number_format($resSql2["TOT"]); ?></td>
+				<td align="right"><?php echo $sql2 //number_format($resSql2["TOT"]); ?></td>
 				<?php } ?>
 				<td align="right"><?php echo number_format($totWeek); ?></td>
 			</tr>
@@ -161,7 +168,7 @@ function getStartAndEndDate($week, $year=2018)
 					$sql3 ="SELECT(SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm))
 					as 'TOT' 
 					FROM dbo.trs_sls_hdr 
-					WHERE (dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2') 
+					WHERE (dbo.trs_sls_hdr.Sls_Date BETWEEN '$awalWeek' AND '$akhirWeek') 
 					AND dbo.trs_sls_hdr.Sls_Invtp = 'S'";
 					//echo $sql3;
 					$exeSql3 = sqlsrv_query($conn,$sql3);
