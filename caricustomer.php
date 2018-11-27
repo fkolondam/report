@@ -11,7 +11,7 @@ function getStartAndEndDate($week, $year=2018)
     $time += 6*24*3600;
     $return[1] = date('Y-n-j', $time);
 	return $return;
-	
+
 }
 ?>
 <html>
@@ -166,7 +166,7 @@ function getStartAndEndDate($week, $year=2018)
 				$sql3 = "SELECT (SUM(dbo.trs_sls_hdr.Sls_Tvallocal)-SUM(dbo.trs_sls_hdr.Sls_SpcDisc)-SUM(dbo.trs_sls_hdr.Sls_Tvaldprm))
 					as 'TOT'
 					FROM dbo.trs_sls_hdr
-					WHERE dbo.trs_sls_hdr.Cus_Code = '$row[Cus_Code]' AND dbo.trs_sls_hdr.Sls_Tvallocal > 0
+					WHERE dbo.trs_sls_hdr.Cus_Code = '$row[Cus_Code]'
 					AND dbo.trs_sls_hdr.Sls_Invtp = 'S'
 					AND (dbo.trs_sls_hdr.Sls_Date BETWEEN '$tgl1' AND '$tgl2')";
 				$exeSql3 = sqlsrv_query($conn,$sql3);
