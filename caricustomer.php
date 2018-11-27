@@ -10,7 +10,8 @@ function getStartAndEndDate($week, $year=2018)
     $return[0] = date('Y-n-j', $time);
     $time += 6*24*3600;
     $return[1] = date('Y-n-j', $time);
-    return $return;
+	return $return;
+	
 }
 ?>
 <html>
